@@ -5,6 +5,7 @@ import os.path
 import pandas as pd
 import joblib
 import requests
+from pathlib import Path
 
 teams = [
     'Innovation - Mapping',
@@ -24,16 +25,14 @@ teams = [
 team_threshold = 0.1
 
 def load_model(name):
-    #filepath = os.path.realpath(__file__)
-    #filename = os.path.join(*filepath.split(os.path.sep)[:-1], "models", name)
-    filename = os.path.join("..", "models", name)
-    return joblib.load(filename)
+    data_folder =  Path("./models").resolve()
+    file_to_open = data_folder / name
+    return joblib.load(str(file_to_open))
 
 def load_keywords():
-    #filepath = os.path.realpath(__file__)
-    #filename = os.path.join(*filepath.split(os.path.sep)[:-1], "models", "saved_keywords.csv")
-    filename = os.path.join("..", "models", "saved_keywords.csv")
-    with open(filename, 'r') as file:
+    data_folder =  Path("./models").resolve()
+    file_to_open = data_folder / 'saved_keywords.csv'
+    with open(str(file_to_open), 'r') as file:
         all_unique_kws = [w for w in file.read().split('\n')[1:] if len(w)]
     return all_unique_kws
 
