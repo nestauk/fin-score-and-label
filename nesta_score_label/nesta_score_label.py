@@ -30,7 +30,7 @@ def load_model(name):
     return joblib.load(filename)
 
 def load_keywords():
-    #filepath = os.path.realpath(__file__)
+    filepath = os.path.realpath(__file__)
     filename = os.path.join(filepath.split(os.path.sep)[:-1], "models", "saved_keywords.csv")
     #filename = os.path.join("..", "models", "saved_keywords.csv")
     with open(filename, 'r') as file:
