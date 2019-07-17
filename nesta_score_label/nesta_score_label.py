@@ -20,16 +20,19 @@ teams = [
     'Innovation - Government '
 ]
 
+
 team_threshold = 0.1
 
 def load_model(name):
-    filepath = os.path.realpath(__file__)
-    filename = os.path.join(*filepath.split(os.path.sep)[:-1], "models", name)
+    #filepath = os.path.realpath(__file__)
+    #filename = os.path.join(*filepath.split(os.path.sep)[:-1], "models", name)
+    filename = os.path.join("..", "models", name)
     return joblib.load(filename)
 
 def load_keywords():
-    filepath = os.path.realpath(__file__)
-    filename = os.path.join(*filepath.split(os.path.sep)[:-1], "models", "saved_keywords.csv")
+    #filepath = os.path.realpath(__file__)
+    #filename = os.path.join(*filepath.split(os.path.sep)[:-1], "models", "saved_keywords.csv")
+    filename = os.path.join("..", "models", "saved_keywords.csv")
     with open(filename, 'r') as file:
         all_unique_kws = [w for w in file.read().split('\n')[1:] if len(w)]
     return all_unique_kws
