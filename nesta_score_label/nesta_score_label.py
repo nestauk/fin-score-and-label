@@ -25,12 +25,12 @@ teams = [
 team_threshold = 0.1
 
 def load_model(name):
-    data_folder =  Path("./models").resolve()
+    data_folder =  Path(".." / "models").resolve()
     file_to_open = data_folder / name
     return joblib.load(str(file_to_open))
 
 def load_keywords():
-    data_folder =  Path("./models").resolve()
+    data_folder =  Path(".." / "models").resolve()
     file_to_open = data_folder / 'saved_keywords.csv'
     with open(str(file_to_open), 'r') as file:
         all_unique_kws = [w for w in file.read().split('\n')[1:] if len(w)]
