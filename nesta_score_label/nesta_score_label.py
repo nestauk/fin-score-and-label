@@ -3,7 +3,7 @@
 import re
 import os.path
 import pandas as pd
-from sklearn.externals import joblib
+import joblib
 import requests
 
 teams = [
@@ -24,13 +24,13 @@ team_threshold = 0.1
 
 def load_model(name):
     filepath = os.path.realpath(__file__)
-    dirpath = '/'.join(filepath.split('/')[:-1])
-    return joblib.load(f'{dirpath}/models/{name}')
+    filename = os.path.join(*filepath.split(os.path.sep)[:-1], "models", name)
+    return joblib.load(filename)
 
 def load_keywords():
     filepath = os.path.realpath(__file__)
-    dirpath = '/'.join(filepath.split('/')[:-1])
-    with open(f'{dirpath}/models/saved_keywords.csv', 'r') as file:
+    filename = os.path.join(*filepath.split(os.path.sep)[:-1], "models", "saved_keywords.csv")
+    with open(filename, 'r') as file:
         all_unique_kws = [w for w in file.read().split('\n')[1:] if len(w)]
     return all_unique_kws
 
