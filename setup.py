@@ -7,21 +7,21 @@ from setuptools import setup, find_packages
 
 requirements = [
     'Click>=6.0',
-    'certifi',
-    'chardet',
-    'idna',
+#    'certifi',
+#    'chardet',
+#    'idna',
     'joblib',
     'numpy',
     'pandas',
-    'python-dateutil',
-    'pytz',
+#    'python-dateutil',
+#    'pytz',
     'requests',
-    'responses',
+#    'responses',
     'scikit-learn',
-    'scipy',
-    'six',
+#    'scipy',
+#    'six',
     'sklearn',
-    'urllib3',
+#    'urllib3',
 ]
 
 setup_requirements = [ ]
