@@ -10,7 +10,7 @@ requirements = [
 #    'certifi',
 #    'chardet',
 #    'idna',
-    'joblib',
+    'joblib>=0.13.2',
     'numpy',
     'pandas',
 #    'python-dateutil',
