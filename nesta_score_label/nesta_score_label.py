@@ -8,17 +8,17 @@ import requests
 from pathlib import Path
 
 teams = [
-    'Innovation - Mapping',
-    'Innovation - NEW',
-    'Innovation - Digital International',
-    'Centre for Collective Intelligence',
-    'Cultural and Creative',
-    'CPC',
+    'Innovation Mapping',
+    'RAP Innovation',
+    'RAP International Innovation',
+    'RAP Explorations',
+    'Creative Economy (RAP and IP)',
+    'Challenge Prizes',
     'Health Lab',
     'Skills',
-    'Explorations',
-    'Education',
-    'Innovation - Government'
+    'RAP Explorations',
+    'Innovation Programmes - Education',
+    'Government Innovation (RAP and IP)'
 ]
 
 
