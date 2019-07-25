@@ -93,7 +93,7 @@ def binary_cols_to_concat_text(row, col_list, output_text_list):
     label = ''
     for col, output  in zip(col_list, output_text_list):
         test = abs(row[col])
-        if test>0:
+        if test.any()>0:
             if label != '':
                 padding = ', '
             else:
