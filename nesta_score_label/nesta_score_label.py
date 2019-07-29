@@ -5,7 +5,12 @@ import os.path
 import pandas as pd
 import joblib
 import requests
-from pathlib import Path
+
+
+try:
+    from pathlib import Path
+except:
+    from pathlib2 import Path
 
 teams = [
     'Innovation Mapping',
@@ -150,14 +155,14 @@ def calculate_labels(feature_matrix):
 
     for team in teams:
         # Load model
-        team_model = load_model(f"team_model_{team}.pkl")
+        team_model = load_model("team_model_" + team + ".pkl")
 
         # Make model & predictions
         team_y_test_proba = team_model.predict_proba(feature_matrix)[:,1]
 
         # Organise predictions
         team_y_test_pred = [1 if x > team_threshold else 0 for x in team_y_test_proba]
-        prediction_df_col_names = ['index', f'proba_{team}', f'pred_{team}']
+        prediction_df_col_names = ['index', 'proba_' + team, 'pred_' + team]
         predictions_array = list(zip(feature_matrix.index, team_y_test_proba, team_y_test_pred))
         predictions_df = pd.DataFrame(predictions_array, columns=prediction_df_col_names).set_index('index')
 

@@ -13,6 +13,7 @@ requirements = [
     'requests',
     'scikit-learn',
     'sklearn',
+    'pathlib',
 ]
 
 setup_requirements = [ ]
