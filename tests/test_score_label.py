@@ -1,7 +1,6 @@
 import json
 import numpy as np
 import pytest
-from sklearn.dummy import DummyClassifier
 from nesta_score_label.nesta_score_label import create_feature_matrix, calculate_scores, calculate_labels
 
 @pytest.fixture

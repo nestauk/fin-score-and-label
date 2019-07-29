@@ -7,26 +7,19 @@ from setuptools import setup, find_packages
 
 requirements = [
     'Click>=6.0',
-#    'certifi',
-#    'chardet',
-#    'idna',
     'joblib>=0.13.2',
     'numpy',
     'pandas',
-#    'python-dateutil',
-#    'pytz',
     'requests',
-#    'responses',
     'scikit-learn',
-#    'scipy',
-#    'six',
     'sklearn',
-#    'urllib3',
 ]
 
 setup_requirements = [ ]
 
-test_requirements = [ ]
+test_requirements = [
+    'pytest',
+]
 
 setup(
     author="Tom Hudson",

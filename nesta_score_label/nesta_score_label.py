@@ -25,11 +25,19 @@ teams = [
 team_threshold = 0.1
 
 def load_model(name):
+    """
+        Loads the model from the model folder
+        Returns: Classifier
+    """
     data_folder =  Path(__file__).resolve().parent
     file_to_open = data_folder / 'models' / name
     return joblib.load(str(file_to_open))
 
 def load_keywords():
+    """
+        Loads the keywords from the models folder
+        Returns: list of strings
+    """
     data_folder =  Path(__file__).resolve().parent
     file_to_open = data_folder / 'models' / 'saved_keywords.csv'
     with open(str(file_to_open), 'r') as file:
@@ -37,9 +45,19 @@ def load_keywords():
     return all_unique_kws
 
 def len_tokenized_text(input_text):
+    """
+        Calculates number of words in text
+        Returns: number
+    """
     return len(input_text.split(" "))
 
 def get_counting_cols(df, search_col_name, keyword_list):
+    """
+        Counts the occurances of keywords in a column of a dataframe
+        Inputs are the dataframe, the column to count keywords,
+        and the keyword list
+        Returns: Dataframe
+    """
     output_df = pd.DataFrame()
     for keyword in keyword_list:
         col_name = "{}_count_{}".format(search_col_name, keyword)
@@ -47,6 +65,10 @@ def get_counting_cols(df, search_col_name, keyword_list):
     return output_df
 
 def tidy_text(input_string):
+    """
+        Cleans an input string
+        Returns: string
+    """
     if type(input_string) != str: return ""
 
     return (re.sub(r"[^\w\s]","",input_string)
@@ -57,6 +79,12 @@ def tidy_text(input_string):
            )
 
 def create_feature_matrix(data, all_unique_kws = None):
+    """
+        Given a list of proposals, and a list of keywords,
+        We generate the feature matrix for each proposal
+        Returns: Dataframe
+    """
+
     # Convert to a pandas dataframe
     df = pd.DataFrame(data)
 
@@ -85,11 +113,21 @@ def create_feature_matrix(data, all_unique_kws = None):
     return X.fillna(0)
 
 def calculate_scores(feature_matrix):
+    """
+        Given a feature matrix for a number of proposals,
+        we load the classifier in and generate the
+        probabilities of interest for nesta
+        Returns: array
+    """
     nesta_model = load_model("nesta_model.pkl")
     probabilities = nesta_model.predict_proba(feature_matrix)[:,1]
     return probabilities
 
 def binary_cols_to_concat_text(row, col_list, output_text_list):
+    """
+        Generates the label of a proposal
+        Returns: string
+    """
     label = ''
     for col, output  in zip(col_list, output_text_list):
         test = abs(row[col])
@@ -102,6 +140,12 @@ def binary_cols_to_concat_text(row, col_list, output_text_list):
     return label
 
 def calculate_labels(feature_matrix):
+    """
+        Given a feature matrix for a number of proposals,
+        we load the classifier in and generate the
+        labels, show which teams would be interested
+        Returns: list
+    """
     team_output_df = pd.DataFrame()
 
     for team in teams:
