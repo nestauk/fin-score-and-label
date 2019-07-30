@@ -3,7 +3,6 @@
 import os
 import joblib
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble.forest import RandomForestClassifier
 from nesta_score_label.generate_keywords import generate_keywords
 from nesta_score_label.utils import create_feature_matrix, team_threshold
@@ -118,10 +117,17 @@ def generate_new_models(input_data_filepath, team_groups_filepath=None, saved_ke
 
 
 if __name__ == '__main__':
+    import sys
+
+    print(sys.argv)
+
     data_folder =  Path(__file__).resolve().parent
 
     input_data_filepath = data_folder / 'data' / 'input_data.xlsx'
     team_groups_filepath = data_folder / 'data' / 'team_groups.xlsx'
+
+    sys.argv
+
     saved_keywords_filepath = data_folder / 'models' / 'saved_keywords.csv'
 
     generate_new_models(input_data_filepath, team_groups_filepath, saved_keywords_filepath)
