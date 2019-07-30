@@ -5,6 +5,7 @@ import joblib
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble.forest import RandomForestClassifier
+from nesta_score_label.generate_keywords import generate_keywords
 from nesta_score_label.utils import create_feature_matrix, team_threshold
 
 try:
@@ -35,7 +36,7 @@ def relabel_input_data_columns(input_data, team_groups):
     dropped_cols = set(team_groups['old_name']).difference(set(team_groups['new_name']))
     return input_data.drop(columns=dropped_cols)
 
-def generate_new_models(input_data_filepath, team_groups_filepath=None):
+def generate_new_models(input_data_filepath, team_groups_filepath=None, saved_keywords_filepath=None):
     """
         Generates model models and saves them in the models folder
     """
@@ -55,6 +56,13 @@ def generate_new_models(input_data_filepath, team_groups_filepath=None):
     columns = input_data.columns.tolist()
     teams = columns[columns.index('NESTA')+1:]
 
+    keywords = None
+    if saved_keywords_filepath:
+        keywords = load_keywords(saved_keywords_filepath)
+    else:
+        print(input_data.columns)
+        keywords = generate_keywords(input_data, models_folder / 'saved_keywords.csv')
+
     # Save team names
     with open(models_folder / 'team_labels.csv', 'w') as file:
         for team in teams: file.write(team + '\n')
@@ -63,7 +71,8 @@ def generate_new_models(input_data_filepath, team_groups_filepath=None):
     remove_old_models()
 
     ### Create model for NESTA
-    feature_matrix = create_feature_matrix(input_data)
+    print('Currently on: NESTA')
+    feature_matrix = create_feature_matrix(input_data, all_unique_kws = keywords)
     labels = input_data['NESTA']
 
     X_train, X_test, y_train, y_test = train_test_split(feature_matrix, labels, test_size = 0.33, random_state = 42)
@@ -113,5 +122,6 @@ if __name__ == '__main__':
 
     input_data_filepath = data_folder / 'data' / 'input_data.xlsx'
     team_groups_filepath = data_folder / 'data' / 'team_groups.xlsx'
+    saved_keywords_filepath = data_folder / 'models' / 'saved_keywords.csv'
 
-    generate_new_models(input_data_filepath, team_groups_filepath)
+    generate_new_models(input_data_filepath, team_groups_filepath, saved_keywords_filepath)

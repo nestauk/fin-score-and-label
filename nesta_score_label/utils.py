@@ -36,13 +36,14 @@ def load_model(name):
     file_to_open = models_folder / 'models' / name
     return joblib.load(str(file_to_open))
 
-def load_keywords():
+def load_keywords(file_to_open=None):
     """
         Loads the keywords from the models folder
         Returns: list of strings
     """
-    data_folder =  Path(__file__).resolve().parent
-    file_to_open = data_folder / 'models' / 'saved_keywords.csv'
+    if not file_to_open:
+        data_folder =  Path(__file__).resolve().parent
+        file_to_open = data_folder / 'models' / 'saved_keywords.csv'
     with open(str(file_to_open), 'r') as file:
         all_unique_kws = [w for w in file.read().split('\n')[1:] if len(w)]
     return all_unique_kws
