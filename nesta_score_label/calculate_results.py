@@ -3,18 +3,28 @@
 import pandas as pd
 from nesta_score_label.utils import load_model, load_teams, team_threshold, binary_cols_to_concat_text
 
-def calculate_scores(feature_matrix):
+def calculate_scores(
+    feature_matrix,
+    models_folder=None
+):
     """
         Given a feature matrix for a number of proposals,
         we load the classifier in and generate the
         probabilities of interest for nesta
         Returns: array
     """
-    nesta_model = load_model("nesta_model.pkl")
-    probabilities = nesta_model.predict_proba(feature_matrix)[:,1]
+    nesta_model = None
+    if models_folder:
+        nesta_model = load_model("nesta_model.pkl", models_folder)
+    else:
+        nesta_model = load_model("nesta_model.pkl")
+    probabilities = nesta_model.predict_proba(feature_matrix)[:,-1]
     return probabilities
 
-def calculate_labels(feature_matrix):
+def calculate_labels(
+    feature_matrix,
+    models_folder=None
+):
     """
         Given a feature matrix for a number of proposals,
         we load the classifier in and generate the
@@ -23,14 +33,22 @@ def calculate_labels(feature_matrix):
     """
     team_output_df = pd.DataFrame()
 
-    teams = load_teams()
+    teams = None
+    if models_folder:
+        teams = load_teams(models_folder)
+    else:
+        teams = load_teams()
 
     for team in teams:
         # Load model
-        team_model = load_model("team_model_" + team + ".pkl")
+        team_model = None
+        if models_folder:
+            team_model = load_model("team_model_" + team + ".pkl", models_folder)
+        else:
+            team_model = load_model("team_model_" + team + ".pkl")
 
         # Make model & predictions
-        team_y_test_proba = team_model.predict_proba(feature_matrix)[:,1]
+        team_y_test_proba = team_model.predict_proba(feature_matrix)[:,-1]
 
         # Organise predictions
         team_y_test_pred = [1 if x > team_threshold else 0 for x in team_y_test_proba]

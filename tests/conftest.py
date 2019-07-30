@@ -1,4 +1,8 @@
 import pytest
+import os
+import shutil
+from pathlib import Path
+from nesta_score_label.generate_models import generate_new_models
 
 @pytest.fixture
 def mocked_keywords():
@@ -32,3 +36,23 @@ def team_names():
         'Innovation Programmes - Education',
         'Government Innovation (RAP and IP)'
     ]
+
+@pytest.fixture
+def generate_test_models():
+    def func():
+        test_models_path = Path(__file__).resolve().parent / 'models'
+        try:
+            os.mkdir(test_models_path)
+        except FileExistsError as e:
+            pass
+
+        input_data_filepath = Path(__file__).resolve().parent / 'input_data_test.xlsx'
+        generate_new_models(input_data_filepath, models_folder=test_models_path)
+    return func
+
+@pytest.fixture
+def remove_test_models():
+    def func():
+        test_models_path = Path(__file__).resolve().parent / 'models'
+        shutil.rmtree(test_models_path)
+    return func

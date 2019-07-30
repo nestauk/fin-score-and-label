@@ -3,24 +3,15 @@
 import os
 import joblib
 import pandas as pd
+from sklearn.model_selection import train_test_split
 from sklearn.ensemble.forest import RandomForestClassifier
 from nesta_score_label.generate_keywords import generate_keywords
-from nesta_score_label.utils import create_feature_matrix, team_threshold
+from nesta_score_label.utils import create_feature_matrix, team_threshold, load_keywords
 
 try:
     from pathlib import Path
 except:
     from pathlib2 import Path
-
-models_folder = Path(__file__).resolve().parent / 'models'
-
-def remove_old_models():
-    """
-        Removes all the pickled models from the models folder
-    """
-    for x in models_folder.iterdir():
-        if x.is_file() and x.suffix == '.pkl':
-            os.remove(str(x))
 
 def relabel_input_data_columns(input_data, team_groups):
     """
@@ -35,7 +26,12 @@ def relabel_input_data_columns(input_data, team_groups):
     dropped_cols = set(team_groups['old_name']).difference(set(team_groups['new_name']))
     return input_data.drop(columns=dropped_cols)
 
-def generate_new_models(input_data_filepath, team_groups_filepath=None, saved_keywords_filepath=None):
+def generate_new_models(
+    input_data_filepath,
+    team_groups_filepath=None,
+    saved_keywords_filepath=None,
+    models_folder=Path(__file__).resolve().parent / 'models'
+):
     """
         Generates model models and saves them in the models folder
     """
@@ -59,17 +55,18 @@ def generate_new_models(input_data_filepath, team_groups_filepath=None, saved_ke
     if saved_keywords_filepath:
         keywords = load_keywords(saved_keywords_filepath)
     else:
-        print(input_data.columns)
         keywords = generate_keywords(input_data, models_folder / 'saved_keywords.csv')
 
     # Save team names
     with open(models_folder / 'team_labels.csv', 'w') as file:
         for team in teams: file.write(team + '\n')
 
-    ### Clear out old models
-    remove_old_models()
+    # Clear out old models
+    for x in models_folder.iterdir():
+        if x.is_file() and x.suffix == '.pkl':
+            os.remove(str(x))
 
-    ### Create model for NESTA
+    # Create model for NESTA
     print('Currently on: NESTA')
     feature_matrix = create_feature_matrix(input_data, all_unique_kws = keywords)
     labels = input_data['NESTA']
@@ -79,17 +76,16 @@ def generate_new_models(input_data_filepath, team_groups_filepath=None, saved_ke
     nesta_model = RandomForestClassifier(n_estimators = 600)
     nesta_model.fit(X_train, y_train)
 
-    ### Store model
+    # Store model
     joblib.dump(nesta_model, models_folder / 'nesta_model.pkl')
 
-    ### Make a df of X and all y columns, but only for projects labelled as interesting
+    # Make a df of X and all y columns, but only for projects labelled as interesting
     team_y_df =  input_data[['NESTA'] + teams].fillna(0)
 
     team_model_df = pd.concat([feature_matrix, team_y_df], axis=1)
     team_model_df = team_model_df[team_model_df.NESTA==1]
 
-    ### Give them scores & save the models
-    team_output_df = pd.DataFrame()
+    # Give them scores & save the models
 
     for team in teams:
         print('Currently on: {}'.format(team))
@@ -102,14 +98,6 @@ def generate_new_models(input_data_filepath, team_groups_filepath=None, saved_ke
         # Make model & predictions
         team_model = RandomForestClassifier(n_estimators=600)
         team_model.fit(team_X_train,team_y_train)
-        team_y_test_proba = team_model.predict_proba(team_X_test)
-
-        # Organise predictions
-        predictions_array = list(zip(team_y_test.index, team_y_test, team_y_test_proba[:,1]))
-        prediction_df_col_names = ['index','true_{}'.format(team),'proba_{}'.format(team)]
-        predictions_df = pd.DataFrame(predictions_array, columns=prediction_df_col_names).set_index('index')
-
-        team_output_df = pd.concat([team_output_df,predictions_df],axis=1)
 
         # Store models
         team_model_name = 'team_model_{}.pkl'.format(team)
@@ -119,15 +107,12 @@ def generate_new_models(input_data_filepath, team_groups_filepath=None, saved_ke
 if __name__ == '__main__':
     import sys
 
-    print(sys.argv)
+    folder =  Path(__file__).resolve().parent
+    input_data_filepath = folder / 'data' / 'input_data.xlsx'
+    team_groups_filepath = folder / 'data' / 'team_groups.xlsx'
 
-    data_folder =  Path(__file__).resolve().parent
-
-    input_data_filepath = data_folder / 'data' / 'input_data.xlsx'
-    team_groups_filepath = data_folder / 'data' / 'team_groups.xlsx'
-
-    sys.argv
-
-    saved_keywords_filepath = data_folder / 'models' / 'saved_keywords.csv'
+    saved_keywords_filepath = None
+    if len(sys.argv) > 1 and sys.argv[1] == 'load_keywords':
+        saved_keywords_filepath = folder / 'models' / 'saved_keywords.csv'
 
     generate_new_models(input_data_filepath, team_groups_filepath, saved_keywords_filepath)

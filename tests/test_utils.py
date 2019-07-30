@@ -2,13 +2,18 @@ import pandas as pd
 from sklearn.ensemble.forest import RandomForestClassifier
 from nesta_score_label.utils import *
 
-def test_load_model(team_names):
-    nesta_model = load_model("nesta_model.pkl")
+def test_load_model(generate_test_models, remove_test_models):
+    generate_test_models()
+    test_models_path = Path(__file__).resolve().parent / 'models'
+    nesta_model = load_model("nesta_model.pkl", test_models_path)
     assert type(nesta_model) == RandomForestClassifier
 
-    for name in team_names:
-        model = load_model("team_model_" + name + ".pkl")
+    teams = load_teams(test_models_path)
+
+    for name in teams:
+        model = load_model("team_model_" + name + ".pkl", test_models_path)
         assert type(model) == RandomForestClassifier
+    remove_test_models()
 
 def test_load_keywords(real_keywords):
     keywords = load_keywords()

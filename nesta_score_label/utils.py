@@ -27,35 +27,37 @@ def binary_cols_to_concat_text(row, col_list, output_text_list):
             label = label + padding + output
     return label
 
-def load_model(name):
+def load_model(
+    name,
+    models_folder =  Path(__file__).resolve().parent / 'models'
+):
     """
         Loads the model from the model folder
         Returns: Classifier
     """
-    models_folder =  Path(__file__).resolve().parent
-    file_to_open = models_folder / 'models' / name
+    file_to_open = models_folder / name
     return joblib.load(str(file_to_open))
 
-def load_keywords(file_to_open=None):
+def load_keywords(
+    models_folder =  Path(__file__).resolve().parent / 'models'
+):
     """
         Loads the keywords from the models folder
         Returns: list of strings
     """
-    if not file_to_open:
-        data_folder =  Path(__file__).resolve().parent
-        file_to_open = data_folder / 'models' / 'saved_keywords.csv'
+    file_to_open = models_folder / 'saved_keywords.csv'
     with open(str(file_to_open), 'r') as file:
         all_unique_kws = [w for w in file.read().split('\n')[1:] if len(w)]
     return all_unique_kws
 
-def load_teams():
+def load_teams(
+    models_folder = Path(__file__).resolve().parent / 'models'
+):
     """
         Loads the keywords from the models folder
         Returns: list of strings
     """
-    data_folder =  Path(__file__).resolve().parent
-    file_to_open = data_folder / 'models' / 'team_labels.csv'
-    with open(str(file_to_open), 'r') as file:
+    with open(str(models_folder / 'team_labels.csv'), 'r') as file:
         teams = [w for w in file.read().split('\n') if len(w)]
     return teams
 

@@ -4,6 +4,8 @@ import pytest
 from nesta_score_label.calculate_results import *
 from nesta_score_label.utils import *
 
+test_models_path = Path(__file__).resolve().parent / 'models'
+
 def test_successful_feature_matrix_created(mocked_entry, mocked_keywords):
     mocked_entries = [mocked_entry]
     fm = create_feature_matrix(mocked_entries, mocked_keywords)
@@ -25,20 +27,26 @@ def test_successful_feature_matrix_created(mocked_entry, mocked_keywords):
     assert fm.iloc[0].total_description_clean_count == 3
     assert fm.iloc[0]['description_clean_count_%_keywords'] == 0.5
 
-def test_successful_calculate_scores_created(mocked_entry, real_keywords):
+def test_successful_calculate_scores_created(mocked_entry, generate_test_models, remove_test_models):
+    generate_test_models()
     mocked_entries = [mocked_entry]
-    fm = create_feature_matrix(mocked_entries, real_keywords)
 
-    scores = calculate_scores(fm)
+    keywords = load_keywords(test_models_path)
+    fm = create_feature_matrix(mocked_entries, keywords)
+    scores = calculate_scores(fm, test_models_path)
 
     # check the size of the output is correct
     assert scores.shape[0] == len(mocked_entries)
+    remove_test_models()
 
-def test_successful_calculate_labels_created(mocked_entry, real_keywords):
+def test_successful_calculate_labels_created(mocked_entry, real_keywords, generate_test_models, remove_test_models):
+    generate_test_models()
     mocked_entries = [mocked_entry]
-    fm = create_feature_matrix(mocked_entries, real_keywords)
+    keywords = load_keywords(test_models_path)
+    fm = create_feature_matrix(mocked_entries, keywords)
 
-    labels = calculate_labels(fm)
+    labels = calculate_labels(fm, test_models_path)
 
     # check the size of the output is correct
     assert labels.shape[0] == len(mocked_entries)
+    remove_test_models()

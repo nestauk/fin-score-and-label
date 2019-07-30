@@ -8,7 +8,6 @@ Basic Commands
 Pre-requisites
 ^^^^^^^^^^^^^^
 * Python3.6
-* Docker
 
 Installation and setup
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -21,16 +20,18 @@ Installation and setup
 
 Create Keywords
 ^^^^^^^^^^^^^^^^^^^^^^
-* Create a list of unique keywords from the input file, and store it as nesta_score_label/models/saved_keywords.csv
+* Create a list of unique keywords from the input file, and store it as `nesta_score_label/models/saved_keywords.csv`
 
     $ python nesta_score_label/generate_keywords.py
 
 Generate new models
 ^^^^^^^^^^^^^^^^^^^^^^
 * Generate predictive models for the overall nesta score and each of the team scores, and saves them in the models folder
+* By adding `load_keywords`, the script will load the keywords from `nesta_score_label/models/saved_keywords.csv`,
+* else a new set of keywords will be generated
 
+    $ python nesta_score_label/generate_models.py [load_keywords]
 
-    $ python nesta_score_label/generate_models.py
 
 Manually editing keywords
 ^^^^^^^^^^^^^^^^^^^^^^
