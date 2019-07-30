@@ -1,41 +1,39 @@
 # -*- coding: utf-8 -*-
 
-import re
-import os.path
-import pandas as pd
 import joblib
-import requests
-
+import re
+import pandas as pd
 
 try:
     from pathlib import Path
 except:
     from pathlib2 import Path
 
-teams = [
-    'Innovation Mapping',
-    'RAP Innovation',
-    'RAP International Innovation',
-    'RAP Explorations',
-    'Creative Economy (RAP and IP)',
-    'Challenge Prizes',
-    'Health Lab',
-    'Skills',
-    'RAP Explorations',
-    'Innovation Programmes - Education',
-    'Government Innovation (RAP and IP)'
-]
-
-
 team_threshold = 0.1
+
+def binary_cols_to_concat_text(row, col_list, output_text_list):
+    """
+        Generates the label of a proposal
+        Returns: string
+    """
+    label = ''
+    for col, output  in zip(col_list, output_text_list):
+        test = abs(row[col])
+        if test.any()>0:
+            if label != '':
+                padding = ', '
+            else:
+                padding = ''
+            label = label + padding + output
+    return label
 
 def load_model(name):
     """
         Loads the model from the model folder
         Returns: Classifier
     """
-    data_folder =  Path(__file__).resolve().parent
-    file_to_open = data_folder / 'models' / name
+    models_folder =  Path(__file__).resolve().parent
+    file_to_open = models_folder / 'models' / name
     return joblib.load(str(file_to_open))
 
 def load_keywords():
@@ -48,6 +46,17 @@ def load_keywords():
     with open(str(file_to_open), 'r') as file:
         all_unique_kws = [w for w in file.read().split('\n')[1:] if len(w)]
     return all_unique_kws
+
+def load_teams():
+    """
+        Loads the keywords from the models folder
+        Returns: list of strings
+    """
+    data_folder =  Path(__file__).resolve().parent
+    file_to_open = data_folder / 'models' / 'team_labels.csv'
+    with open(str(file_to_open), 'r') as file:
+        teams = [w for w in file.read().split('\n') if len(w)]
+    return teams
 
 def len_tokenized_text(input_text):
     """
@@ -116,61 +125,3 @@ def create_feature_matrix(data, all_unique_kws = None):
     X["project_name_clean_count_%_keywords"] = X["total_project_name_clean_count"] / df["project_name_clean_len"]
 
     return X.fillna(0)
-
-def calculate_scores(feature_matrix):
-    """
-        Given a feature matrix for a number of proposals,
-        we load the classifier in and generate the
-        probabilities of interest for nesta
-        Returns: array
-    """
-    nesta_model = load_model("nesta_model.pkl")
-    probabilities = nesta_model.predict_proba(feature_matrix)[:,1]
-    return probabilities
-
-def binary_cols_to_concat_text(row, col_list, output_text_list):
-    """
-        Generates the label of a proposal
-        Returns: string
-    """
-    label = ''
-    for col, output  in zip(col_list, output_text_list):
-        test = abs(row[col])
-        if test.any()>0:
-            if label != '':
-                padding = ', '
-            else:
-                padding = ''
-            label = label + padding + output
-    return label
-
-def calculate_labels(feature_matrix):
-    """
-        Given a feature matrix for a number of proposals,
-        we load the classifier in and generate the
-        labels, show which teams would be interested
-        Returns: list
-    """
-    team_output_df = pd.DataFrame()
-
-    for team in teams:
-        # Load model
-        team_model = load_model("team_model_" + team + ".pkl")
-
-        # Make model & predictions
-        team_y_test_proba = team_model.predict_proba(feature_matrix)[:,1]
-
-        # Organise predictions
-        team_y_test_pred = [1 if x > team_threshold else 0 for x in team_y_test_proba]
-        prediction_df_col_names = ['index', 'proba_' + team, 'pred_' + team]
-        predictions_array = list(zip(feature_matrix.index, team_y_test_proba, team_y_test_pred))
-        predictions_df = pd.DataFrame(predictions_array, columns=prediction_df_col_names).set_index('index')
-
-        # Add team predictions to teams dataframe
-        team_output_df = pd.concat([team_output_df,predictions_df],axis=1)
-
-    # Calculate the labels
-    pred_teams = ['pred_' + s for s in teams]
-    team_output_df['team_label'] = team_output_df.apply(binary_cols_to_concat_text, axis = 1, col_list = pred_teams, output_text_list = teams)
-
-    return team_output_df['team_label']
