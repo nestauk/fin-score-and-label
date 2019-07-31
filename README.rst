@@ -67,22 +67,22 @@ Prepare
 Model
 
 	1. Create features: Adding data points for each project
-		  A:  number of times the keyword is found within project_name (for each keyword)
-		  B:  number of times the keyword is found within project_description (for each keyword)
-		  C:  total times keywords are found within project_name
-		  D:  total time keywords are found within project_description
-		  E:  C / number of characters in the project_name
-		  F:  D / number of characters in the project_description
+		*  A:  number of times the keyword is found within project_name (for each keyword)
+		*  B:  number of times the keyword is found within project_description (for each keyword)
+		*  C:  total times keywords are found within project_name
+		*  D:  total time keywords are found within project_description
+		*  E:  C / number of characters in the project_name
+		*  F:  D / number of characters in the project_description
 
 	2. Understand the model: Overview of how a Random Forest works
 		* Some of the above features are selected at random, and a decision tree is created
-		(e.g. It determines that If total counts of 'innovation' in the project description is above 4, the project is likely to be interesting to Nesta)
+		* (e.g. It determines that If total counts of 'innovation' in the project description is above 4, the project is likely to be interesting to Nesta)
 		* 600 of these decision trees are created in total, each one using a different random set of features
 
 	3. Applying the rank: How interesting the project is to Nesta, between 0 and 1
 		* A Random Forest model attempts to understand the relationship between all the features and the 'NESTA' column (interesting to Nesta vs not interesting)
 		* To score a project, the output of each of these trees is recorded
-		  (e.g. If 300 predict 'interesting', then the score is 300/600 = 0.5)
+		*  (e.g. If 300 predict 'interesting', then the score is 300/600 = 0.5)
 		* The output scores are kept as they are, in a column called 'rank'
 
 	4. Applying the label: Identifying the teams it is interesting to
