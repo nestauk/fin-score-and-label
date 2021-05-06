@@ -95,13 +95,15 @@ def generate_new_models(
         team_X = team_model_df[feature_matrix.columns]
         team_X_train, team_X_test, team_y_train, team_y_test = train_test_split(team_X, team_y, test_size = 0.33, random_state = 42)
 
-        # Make model & predictions
-        team_model = RandomForestClassifier(n_estimators=600)
-        team_model.fit(team_X_train,team_y_train)
+        
+        if not team_X_train.empty:
+            # Make model & predictions
+            team_model = RandomForestClassifier(n_estimators=600)
+            team_model.fit(team_X_train,team_y_train)
 
-        # Store models
-        team_model_name = 'team_model_{}.pkl'.format(team)
-        joblib.dump(team_model, models_folder / team_model_name)
+            # Store models
+            team_model_name = 'team_model_{}.pkl'.format(team)
+            joblib.dump(team_model, models_folder / team_model_name)
 
 
 if __name__ == '__main__':

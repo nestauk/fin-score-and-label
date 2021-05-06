@@ -5,3 +5,4 @@ sklearn
 joblib
 xlrd
 scikit-learn==0.20.1
+openpyxl

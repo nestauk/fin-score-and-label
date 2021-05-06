@@ -18,9 +18,10 @@ def kw_column_to_clean_kw_set(keyword_column):
         Creates a set of keywords from the input column
         Returns: set
     """
-    list_of_kw_lists = keyword_column.map(lambda x: x.split(', '))
+    list_of_kw_lists = keyword_column.map(lambda x: re.split(r"[,;\/\n]", x))
     all_keywords = [y for x in list_of_kw_lists for y in x]
-    tidied_list = messy_list_to_tidy_list(all_keywords)
+    trimmed_keywords =[ x.strip() for x in all_keywords]
+    tidied_list = messy_list_to_tidy_list(trimmed_keywords)
     return set(tidied_list)
 
 def generate_keywords(input_data, output_filepath = None):
